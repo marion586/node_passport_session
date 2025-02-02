@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const passport = require("passport");
 const authRoutes = require("./routes/authRoutes");
+const taskRoutes = require("./routes/taskRoutes");
+
 require("dotenv").config();
 require("./config/passeport");
 const MongoStore = require("connect-mongo");
@@ -32,6 +34,8 @@ app.use(passport.session());
 
 // Routes
 app.use("/auth", authRoutes);
+app.use("/tasks", taskRoutes);
+
 
 // connect to MongoDb
 
