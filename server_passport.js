@@ -4,6 +4,7 @@ const app = express();
 const session = require("express-session");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
+const MongoStore = require("connect-mongo");
 
 app.use(express.urlencoded({ extended: false }));
 
@@ -13,6 +14,11 @@ app.use(
     secret: "secret",
     resave: false,
     saveUninitialized: true,
+    store: MongoStore.create({
+      mongoUrl: "mongodb://localhost:27017/test-app-session", // YOUR MONGODB URL
+      ttl: 14 * 24 * 60 * 60,
+      autoRemove: "native",
+    }),
   })
 );
 
@@ -104,4 +110,27 @@ app.post(
 
 app.get("/dashboard", (req, res) => {
   res.render("dashboard.ejs", { name: req.user.name });
+});
+
+app.get("/", (req, res, next) => {
+  req.session.user = {
+    uuid: "12234-2345-2323423",
+  }; //THIS SETS AN OBJECT - 'USER'
+  req.session.save((err) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.send(req.session.user); // YOU WILL GET THE UUID IN A JSON FORMAT
+    }
+  }); //THIS SAVES THE SESSION.
+});
+
+app.get("/end", (req, res, next) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.send("Session is destroyed");
+    }
+  });
 });
