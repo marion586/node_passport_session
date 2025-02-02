@@ -6,7 +6,7 @@ const User = require("../models/User");
 passport.use(
   new LocalStrategy(async (username, password, done) => {
     try {
-      const user = await User.findone({ username });
+      const user = await User.findOne({ username });
       if (!user) return done(null, false, { message: "User not found" });
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch)
@@ -18,12 +18,14 @@ passport.use(
   })
 );
 passport.serializeUser((user, done) => {
+  console.log(user, "seriallizer");
   done(null, user.id);
 });
 
 passport.deserializeUser(async (id, done) => {
   try {
     const user = await User.findById(id);
+    console.log(user, "deseriallizer");
     done(null, user);
   } catch (error) {
     done(error);
